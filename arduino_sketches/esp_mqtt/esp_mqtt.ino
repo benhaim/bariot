@@ -45,7 +45,7 @@ void setup_wifi() {
   Serial.println("WiFi connected");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
-  Serial.println("-----------");
+  Serial.println("-----------");  //TODO replace with led indication
 }
 
 
@@ -53,6 +53,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   String message = "";
 
+
+  ///////////////////// read message char by char from MQTT /////////////////////
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
@@ -61,6 +63,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
   Serial.println(message);
   
+
+  
+  ///////////////////// split message to command /////////////////////
   int comma1i = message.indexOf(",");
   int comma2i = message.indexOf(",",comma1i+1);
   int comma3i = message.indexOf(",",comma2i+1);
@@ -75,6 +80,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   int pin = pin_num.toInt();
   
+
+
+  ///////////////////// execute command /////////////////////
   if ( (command == "pwm") || (command == "PWM") )
   {
                     Serial.print("analogWrite: ");Serial.print(pin);Serial.print(",");Serial.println(dovalue);
@@ -91,13 +99,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
   
 
 
-  digitalWrite(12, ((char)payload[0] == '1') ? LOW : HIGH); Serial.print("pin12: "); Serial.println((char)payload[0]);
+  digitalWrite(12, ((char)payload[0] == '1') ? LOW : HIGH); Serial.print("pin12: "); Serial.println((char)payload[0]); //TODO verify above and remove
   digitalWrite(13, ((char)payload[1] == '1') ? LOW : HIGH); Serial.print("pin13: "); Serial.println((char)payload[1]);
   digitalWrite(14, ((char)payload[2] == '1') ? LOW : HIGH); Serial.print("pin14: "); Serial.println((char)payload[2]);
 
 }
 
-void reconnect() {
+void reconnect() {  //TODO understand this function and rewrite
   // Loop until we're reconnected
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
@@ -126,7 +134,7 @@ void setup() {
   Serial.begin(115200);
   WiFiManager wifiManager;
 
-  ///wifiManager.autoConnect("AutoConnectAP");
+  ///wifiManager.autoConnect("AutoConnectAP");  //TODO enable connecting any SSID
   
   setup_wifi();
   client.setServer(mqtt_server, 1883);
@@ -138,7 +146,7 @@ bool lastButtonState = false;
 
 void loop() {
 
-    if ((millis()%6000)>5800) { Serial.println("alive"); }
+    if ((millis()%6000)>5800) { Serial.println("alive"); }  //TODO replace with led blink
 
     if (!client.connected()) { reconnect(); }
 
